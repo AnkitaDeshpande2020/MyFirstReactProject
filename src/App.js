@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 function App() {
   return (
     <div className="App">
@@ -14,10 +14,11 @@ function Square({ value,onSquareClick }) {
 }
 function Board(){
   const [xIsNext, setXIsNext] = useState(true);
-  const [squares, setSquares] = useState(Array(9).fill(null));
+  const [squares, setSquares] = useState(Array(9).fill("."));
+  const [showWinner, setShowWinner] = useState(false);
 
      function handleClick(i) {
-      if (calculateWinner(squares) || squares[i]) {
+      if (squares[i]!=="." || calculateWinner(squares)) {
         return;
       }
       const nextSquares = squares.slice();
@@ -30,32 +31,41 @@ function Board(){
       setXIsNext(!xIsNext);
       
   }
-  let winner 
-    let status;
+  let winner;
   if(squares && squares.length>0){
-
      winner = calculateWinner(squares);
-    if (winner) {
-      status = 'Winner: ' + winner;
-      return  (<>
-      <div className="status">{status}</div>
-      <div className='reset-btn'>
-      <button className='reset' onClick={()=>resetGame()}>Play Again</button>
-    </div>
-      </>);
-    } /* else {
-      status = 'Next player: ' + (xIsNext ? 'X' : 'O');
-    } */
-    
   }
   function resetGame(){
-    setSquares(Array(9).fill(null));
+    setSquares(Array(9).fill("."));
   setXIsNext(true);
+  setShowWinner(false);
   } 
+  useEffect(() => {
+    if (winner) {
+      const timeoutId = setTimeout(() => {
+        setShowWinner(true);
+      }, 1000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [winner]);
+
+  const status = winner ? `Winner: ${winner}` : '';
   return (
     <>
-   
-    <div className="board-row">
+       <div>
+      {showWinner && (
+        <>
+          <div className="status">{status}</div>
+          <div className='reset-btn'>
+            <button className='reset' onClick={resetGame}>Play Again</button>
+          </div>
+        </>
+      )}
+    </div>
+
+    {!showWinner && (
+      <>
+      <div className="board-row">
       <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
       <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
       <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
@@ -71,6 +81,8 @@ function Board(){
       <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
     </div>
     <button className='reset' onClick={()=>resetGame()}>Reset</button>
+      </>
+    )}
     
   </>
   ); 
@@ -89,7 +101,7 @@ function calculateWinner(squares) {
   ];
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+    if (squares[a]!=="." && squares[a] === squares[b] && squares[a] === squares[c]) {
       return squares[a];
     }
   }
