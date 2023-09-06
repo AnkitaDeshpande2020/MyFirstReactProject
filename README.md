@@ -1,7 +1,7 @@
 # MyFirstReactProject
-first react project
+My first react project
 
 
-#Demo
+
 For Demo, visit
 https://codesandbox.io/s/github/AnkitaDeshpande2020/MyFirstReactProject?file=/src/App.js
